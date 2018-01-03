@@ -1,6 +1,5 @@
 ---
-- hosts: dev-docker
-  vars:
+- vars:
     docker_edition: 'ce'
     docker_repos: 'https://download.docker.com/linux/centos/docker-{{docker_edition}}.repo'
     docker_users: []
