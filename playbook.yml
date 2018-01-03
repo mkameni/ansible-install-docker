@@ -1,6 +1,5 @@
 ---
-- hosts:
-  
+- hosts: dev-docker
   vars:
     docker_edition: 'ce'
     docker_repos: 'https://download.docker.com/linux/centos/docker-{{docker_edition}}.repo'
@@ -13,7 +12,7 @@
     docker_compose_dest: /usr/bin/docker-compose''
     
   
-  reomte_user: root
+  remote_user: root
 
   tasks:
   - name: Check if docker package is installed
