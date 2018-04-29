@@ -1,70 +1,38 @@
 ---
-- vars:
-    docker_edition: 'ce'
-    docker_repos: 'https://download.docker.com/linux/centos/docker-{{docker_edition}}.repo'
-    docker_users: []
-    docker_options: []
-    
-    docker_install_docker_compose: True
-    docker_compose_version: '1.18.0'
-    docker_compose_url: 'https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64'
-    docker_compose_dest: /usr/bin/docker-compose''
-    
-  
-  remote_user: root
+- name: Docker | Install docker and docker compose on CentOS 7
+  hosts: homelab-docker
+  become: true
+
+  vars_files:
+    - vars/main.yml
 
   tasks:
-  - name: Check if docker package is installed
-    yum:
-        list=docker
-    register: is_docker
+    - name: Check if docker package is installed
+      yum: list=docker
+      register: is_docker
 
-  - name: Remove old version
-    yum:
-      name: '{{ item }}'
-      state: 'absent'
-    with_items:
-      - 'docker'
-      - 'docker-common'
-      - 'docker-selinux'
-      - 'docker-engine'
-    when: is_docker
+    - name: Remove old version
+      yum: name='{{ item }}' state='absent'
+      with_items: '{{ docker_old_component }}'
+      when: is_docker
 
-  - name: Install Docker dependencies
-    yum:
-      name: '{{ item }}'
-      state: 'present'
-    with_items:
-      - 'yum-utils'
-      - 'device-mapper-persistent-data'
-      - 'lvm2'
+    - name: Install Docker dependencies
+      yum: name='{{ item }}' state='present'
+      with_items: '{{ docker_dependencies }}'
 
-  - name: Add docker repository
-    yum_repository:
-      name: docker-'{{ docker_edition }}'
-      description: docker stable repository
-      baseurl: '{{ docker_repos }}'
+    - name: Add docker repository
+      yum_repository: name=docker-'{{ docker_edition }}' description='docker stable repository' baseurl='{{ docker_repos }}'
 
-  - name: Install Docker
-    yum:
-      name: 'docker-{{ docker_edition }}'
-      state: 'present'
+    - name: Install Docker
+      yum: name='docker' state='latest'
 
-  - name: Install Docker Compose
-    get_url:
-      url: '{{ docker_compose_url }}'
-      dest: '{{ docker_compose_dest }}'
-      force: True
-      owner: 'root'
-      group: 'root'
-      mode: '0755'
-    when: docker_install_docker_compose
-  
-  - name: ensure docker is running (and enable it at boot)
-    service: name=docker state=started enabled=yes
-  
+    - name: Install Docker Compose
+      get_url: url='{{ docker_compose_url }}' dest='{{ docker_compose_dest }}' force=True owner='root' group='root' mode='0755'
+      when: docker_install_docker_compose
+
+    - name: ensure docker is running (and enable it at boot)
+      service: name=docker state=started enabled=yes
+
   handlers:
   - name: Restart Docker
-    service:
-      name: 'docker'
-      state: 'restarted'
+    service: name:='docker' state='restarted'

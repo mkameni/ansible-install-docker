@@ -1,0 +1,27 @@
+---
+docker_old_component:
+  - 'docker'
+  - 'docker-client'
+  - 'docker-client-latest'
+  - 'docker-common'
+  - 'docker-latest'
+  - 'docker-latest-logrotate'
+  - 'docker-logrotate'
+  - 'docker-selinux'
+  - 'docker-engine-selinux'
+  - 'docker-engine'
+
+docker_dependencies:
+  - 'yum-utils'
+  - 'device-mapper-persistent-data'
+  - 'lvm2'
+
+docker_edition: 'ce'
+docker_repos: 'https://download.docker.com/linux/centos/docker-{{docker_edition}}.repo'
+docker_users: []
+docker_options: []
+
+docker_install_docker_compose: True
+docker_compose_version: '1.21.0'
+docker_compose_url: 'https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64'
+docker_compose_dest: '/usr/bin/docker-compose'
